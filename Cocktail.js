@@ -68,7 +68,7 @@
 
     var originalExtend;
 
-    Cocktail.patch = function patch(Backbone) {
+    Cocktail.patch = function patch(KlassMap) {
         originalExtend = Backbone.Model.extend;
 
         var extend = function(protoProps, classProps) {
@@ -82,20 +82,26 @@
             return klass;
         };
 
-        _.each([Backbone.Model, Backbone.Collection, Backbone.Router, Backbone.View], function(klass) {
-            klass.mixin = function mixin() {
-                Cocktail.mixin(this, _.toArray(arguments));
-            };
+        _.each(KlassMap, function(klassArray, moduleName) {
+            _.each(klassArray, function(klassName) {
+                var klass = window[moduleName][klassName];
+                klass.mixin = function mixin() {
+                    Cocktail.mixin(this, _.toArray(arguments));
+                };
 
-            klass.extend = extend;
+                klass.extend = extend;
+            });
         });
     };
 
-    Cocktail.unpatch = function unpatch(Backbone) {
-        _.each([Backbone.Model, Backbone.Collection, Backbone.Router, Backbone.View], function(klass) {
-            klass.mixin = undefined;
-            klass.extend = originalExtend;
-        });
+    Cocktail.unpatch = function unpatch(KlassMap) {
+        _.each(KlassMap, function(klassArray, moduleName) {
+            _.each(klassArray, function(klassName) {
+                var klass = window[moduleName][klassName];
+                klass.mixin = undefined;
+                klass.extend = originalExtend;
+            });
+        })
     };
 
     return Cocktail;
