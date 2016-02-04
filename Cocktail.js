@@ -69,7 +69,7 @@
     var originalExtend;
 
     Cocktail.patch = function patch(KlassMap) {
-        originalExtend = Backbone.Model.extend;
+        originalExtend = Backbone.Marionette.extend;
 
         var extend = function(protoProps, classProps) {
             var klass = originalExtend.call(this, protoProps, classProps);
